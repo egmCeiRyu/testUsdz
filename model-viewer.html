@@ -12,7 +12,8 @@
 <body>
   <model-viewer ar id="modelViewer"
     ar-modes="webxr scene-viewer quick-look"
-    src="" ios-src=""
+    src=""
+    ios-src=""
     shadow-intensity="1"
     shadow-softness="1"
     camera-controls
@@ -71,10 +72,11 @@
     if (modelUrl) {
       const baseName = modelUrl.split('/').pop().split('.')[0]; // e.g. model.glb → model
       const glbPath = modelUrl;
-      const usdzPath = modelUrl.replace('.glb', '.usdz'); // assumes same folder and filename
+      // safer replacement for .glb extension (ignore query params)
+      const usdzPath = modelUrl.replace(/\.glb(\?.*)?$/, '.usdz');
 
       modelViewer.setAttribute('src', glbPath);
-      modelViewer.setAttribute('ios-src', `${usdzPath}#callToAction=More%20Info&checkoutURL=https://example.com/moreinfo.html`);
+      modelViewer.setAttribute('ios-src', usdzPath);
     }
 
     const dimElements = [...modelViewer.querySelectorAll('button'), modelViewer.querySelector('#dimLines')];
@@ -136,9 +138,9 @@
       modelViewer.cameraOrbit = `0deg 75deg ${maxDim * 10.5}m`;
     });
     
-      function animationLoop() {
-        renderSVG();
-        requestAnimationFrame(animationLoop);
+    function animationLoop() {
+      renderSVG();
+      requestAnimationFrame(animationLoop);
     }
 
     animationLoop(); // Start loop
