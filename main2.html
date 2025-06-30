@@ -65,13 +65,16 @@
   dirLight.position.set(3, 10, 10);
   scene.add(dirLight);
 
-  // Load local GLB model
+  let model = null;
+
+  // Load GLB model
   const loader = new GLTFLoader();
   loader.load(
-    'models/model1.glb', // Your local GLB model path
+    'models/model1.glb',
     function (gltf) {
-      scene.add(gltf.scene);
-      gltf.scene.position.set(0, 0, 0);
+      model = gltf.scene;
+      model.position.set(0, 0, 0);
+      scene.add(model);
     },
     undefined,
     function (error) {
@@ -79,48 +82,43 @@
     }
   );
 
-  // Simple animation loop
+  // Animation loop
   function animate() {
     requestAnimationFrame(animate);
-    scene.rotation.y += 0.005;
+    if (model) model.rotation.y += 0.005;
     renderer.render(scene, camera);
   }
   animate();
 
-  // AR Button functionality
+  // AR Button
   const arButton = document.getElementById('ar-button');
 
   arButton.addEventListener('click', () => {
-    // Local model URLs relative to your HTML page
-    const glbUrl = encodeURIComponent(window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '') + '/models/model1.glb');
-    const usdzUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '') + '/models/model1.usdz';
+    const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '');
+    const glbUrl = `${baseUrl}/models/model1.glb`;
+    const usdzUrl = `${baseUrl}/models/model1.usdz`;
 
-    const userAgent = window.navigator.userAgent.toLowerCase();
-    const isIOS = /iphone|ipad|ipod/.test(userAgent);
-    const isAndroid = /android/.test(userAgent);
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isAndroid = /android/i.test(navigator.userAgent);
 
     if (isIOS) {
-      // iOS: open Quick Look with USDZ model
       const anchor = document.createElement('a');
       anchor.setAttribute('rel', 'ar');
       anchor.setAttribute('href', usdzUrl);
+      anchor.setAttribute('quicklook-browser', 'safari');
       anchor.style.display = 'none';
       document.body.appendChild(anchor);
       anchor.click();
       document.body.removeChild(anchor);
-
     } else if (isAndroid) {
-      // Android: open Scene Viewer with GLB model
-      const sceneViewerUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${glbUrl}&mode=ar_preferred#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;end`;
-
-      window.location.href = sceneViewerUrl;
-
+      const intentUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(glbUrl)}&mode=ar_preferred#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;S.browser_fallback_url=${encodeURIComponent(glbUrl)};end`;
+      window.location.href = intentUrl;
     } else {
-      alert('AR is only supported on iOS and Android devices.');
+      alert('AR Quick Look is only supported on iOS and Android devices.');
     }
   });
 
-  // Handle window resize
+  // Handle resize
   window.addEventListener('resize', () => {
     camera.aspect = container.clientWidth / container.clientHeight;
     camera.updateProjectionMatrix();
