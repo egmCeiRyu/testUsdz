@@ -68,7 +68,7 @@
   // Load GLB model
   const loader = new GLTFLoader();
   loader.load(
-    'https://modelviewer.dev/shared-assets/models/Astronaut.glb', // Example public GLB model
+    'models/model1.glb', // Example public GLB model
     function (gltf) {
       scene.add(gltf.scene);
       gltf.scene.position.set(0, 0, 0);
@@ -92,8 +92,8 @@
 
   arButton.addEventListener('click', () => {
     // URLs for AR models (you need your own hosting or public URLs)
-    const glbUrl = encodeURIComponent('https://modelviewer.dev/shared-assets/models/Astronaut.glb');
-    const usdzUrl = 'https://modelviewer.dev/shared-assets/models/Astronaut.usdz';
+    const glbUrl = encodeURIComponent('models/model1.glb');
+    const usdzUrl = 'models/model1.usdz';
 
     const userAgent = window.navigator.userAgent.toLowerCase();
     const isIOS = /iphone|ipad|ipod/.test(userAgent);
